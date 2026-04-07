@@ -22,6 +22,9 @@ export interface Work {
   thumbnail: string;
   thumbnail_en?: string; // EN-specific image override (ACF field: EN_image)
   thumbnail_jp?: string; // JP-specific image override (ACF field: JP_image)
+  previewImage_ko?: string;
+  previewImage_en?: string;
+  previewImage_jp?: string;
   oneLineInfo_ko?: string;
   oneLineInfo_en?: string;
   oneLineInfo_jp?: string;

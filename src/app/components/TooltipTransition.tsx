@@ -4,7 +4,7 @@ import { gsap } from 'gsap';
 import { useWorks } from '@/contexts/WorkContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Work } from '@/types/work';
-import { getLocalizedGalleryImages } from '@/utils/getLocalizedImage';
+import { getLocalizedGalleryImages, getLocalizedThumbnail } from '@/utils/getLocalizedImage';
 import { X } from 'lucide-react';
 
 interface TooltipTransitionProps {
@@ -36,27 +36,6 @@ export const TooltipTransition: React.FC<TooltipTransitionProps> = ({
   const slideshowTimer = useRef<gsap.core.Tween | null>(null);
   const slideshowIndexRef = useRef<number>(0);
 
-  const extractImagesFromHtml = (html: string): string[] => {
-    if (!html) return [];
-
-    const images: string[] = [];
-    const seen = new Set<string>();
-
-    const imgRegex = /<img[^>]+src="([^">]+)"/gi;
-    let match: RegExpExecArray | null;
-
-    while ((match = imgRegex.exec(html)) !== null) {
-      const src = match[1]?.trim();
-      if (!src) continue;
-      if (seen.has(src)) continue;
-
-      seen.add(src);
-      images.push(src);
-    }
-
-    return images;
-  };
-
   // Update active work
   useEffect(() => {
     if (hoveredWorkId) {
@@ -69,32 +48,22 @@ export const TooltipTransition: React.FC<TooltipTransitionProps> = ({
     }
   }, [hoveredWorkId, works]);
 
-  const images = useMemo(() => {
+      const images = useMemo(() => {
     if (!activeWork) return [];
 
-    const koContent = activeWork.content_rendered || '';
-
-    const localizedContent =
-      lang === 'en'
-        ? activeWork.content_en?.trim() || koContent
-        : lang === 'jp'
-        ? activeWork.content_jp?.trim() || koContent
-        : koContent;
-
-    const htmlImages = extractImagesFromHtml(localizedContent);
-
-    // 1순위: 현재 언어 HTML에서 추출된 이미지
-    if (htmlImages.length > 0) {
-      return Array.from(new Set(htmlImages));
+    // hover 상태 (닫힌 상태) → 대표 이미지 1장만
+    if (!isOpen) {
+      const thumb = getLocalizedThumbnail(activeWork, lang);
+      return thumb ? [thumb] : [];
     }
 
-    // fallback: 기존 galleryImages 기반
-    const fallbackImages = getLocalizedGalleryImages(activeWork as any, lang).filter(
+    // open 상태 → 기존 gallery 유지
+    const galleryImages = getLocalizedGalleryImages(activeWork, lang).filter(
       Boolean
     ) as string[];
 
-    return Array.from(new Set(fallbackImages));
-  }, [activeWork, lang]);
+    return Array.from(new Set(galleryImages));
+  }, [activeWork, lang, isOpen]);
 
   // Slideshow
   useEffect(() => {

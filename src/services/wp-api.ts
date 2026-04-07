@@ -1163,6 +1163,8 @@ const transformWorkListItem = (post: WPPost): Work => {
 
   const acf = post.acf || {};
 
+  const previewImage_ko = featuredImage;
+
   const title_ko = decode(post.title.rendered);
   const title_en = acf['제목_en'] ? decode(acf['제목_en']) : title_ko;
   const title_jp = acf['제목_jp'] ? decode(acf['제목_jp']) : title_ko;
@@ -1253,6 +1255,9 @@ const transformWorkListItem = (post: WPPost): Work => {
               ''
       )
     : undefined;
+
+  const previewImage_en = thumbnail_en || featuredImage;
+  const previewImage_jp = thumbnail_jp || featuredImage;
 
   let youtubeUrl: string | undefined;
   if ((post as any).acf?.youtube_url) {
@@ -1351,6 +1356,10 @@ const transformWorkListItem = (post: WPPost): Work => {
     title_ko,
     title_en,
     title_jp,
+
+    previewImage_ko,
+    previewImage_en,
+    previewImage_jp,
 
     year: yearFromCategory || new Date(post.date).getFullYear(),
 

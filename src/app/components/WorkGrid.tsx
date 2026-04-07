@@ -57,31 +57,6 @@ export const WorkGrid = ({ currentFilter, onFilterChange }: WorkGridProps) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const extractFirstImageFromHtml = (html: string): string => {
-    if (!html) return '';
-
-    const match = html.match(/<img[^>]+src="([^">]+)"/i);
-    return match?.[1]?.trim() || '';
-  };
-
-  const getLocalizedGridImage = (work: any): string => {
-    const koContent = work.content_rendered || '';
-
-    const localizedContent =
-      lang === 'en'
-        ? (work.content_en?.trim() || koContent)
-        : lang === 'jp'
-        ? (work.content_jp?.trim() || koContent)
-        : koContent;
-
-    const firstImageFromLocalizedHtml = extractFirstImageFromHtml(localizedContent);
-    if (firstImageFromLocalizedHtml) {
-      return firstImageFromLocalizedHtml;
-    }
-
-    return getLocalizedThumbnail(work, lang) || '';
-  };
-
   const sortedWorks = useMemo(() => {
     if (!works || works.length === 0) return [];
 
@@ -161,7 +136,7 @@ export const WorkGrid = ({ currentFilter, onFilterChange }: WorkGridProps) => {
   const getMedium = (work: any) =>
     lang === 'ko' ? work.medium_ko : lang === 'jp' ? work.medium_jp : work.medium_en;
 
-  const prefetchWorkDetail = async (work: any) => {
+    const prefetchWorkDetail = async (work: any) => {
     const key = `${work.id}_${lang}`;
 
     if (prefetchedWorkIdsRef.current.has(key)) return;
@@ -170,13 +145,10 @@ export const WorkGrid = ({ currentFilter, onFilterChange }: WorkGridProps) => {
     try {
       fetchWorkById(work.id, lang);
 
-      const mainImg = new Image();
-      mainImg.src = getLocalizedGridImage(work);
-
       const thumb = getLocalizedThumbnail(work, lang);
-      if (thumb && thumb !== mainImg.src) {
-        const thumbImg = new Image();
-        thumbImg.src = thumb;
+      if (thumb) {
+        const mainImg = new Image();
+        mainImg.src = thumb;
       }
     } catch (error) {
       console.error('Failed to prefetch work detail:', error);
@@ -247,27 +219,27 @@ export const WorkGrid = ({ currentFilter, onFilterChange }: WorkGridProps) => {
                     onFocus={() => {
                       prefetchWorkDetail(work);
                     }}
-                    onClick={async () => {
-                      try {
-                        const fetchPromise = fetchWorkById(work.id, lang);
+                                        onClick={async () => {
+  try {
+    const fetchPromise = fetchWorkById(work.id, lang);
 
-                        const img = new Image();
-                        img.src = getLocalizedGridImage(work);
+    const img = new Image();
+    img.src = getLocalizedThumbnail(work, lang) || '';
 
-                        await Promise.race([
-                          fetchPromise,
-                          new Promise((res) => setTimeout(res, 240)),
-                        ]);
-                      } catch (e) {
-                        console.error('prefetch failed', e);
-                      }
+    await Promise.race([
+      fetchPromise,
+      new Promise((res) => setTimeout(res, 240)),
+    ]);
+  } catch (e) {
+    console.error('prefetch failed', e);
+  }
 
-                      window.location.hash = `#/work/${work.id}`;
-                    }}
+  window.location.hash = `#/work/${work.id}`;
+}}
                   >
                     <div className="relative w-full aspect-[4/3] overflow-hidden">
-                      <PremiumImage
-                        src={getLocalizedGridImage(work) || ''}
+                                            <PremiumImage
+                        src={getLocalizedThumbnail(work, lang) || ''}
                         alt={getTitle(work)}
                         className={`w-full h-full ${isMobile ? 'object-contain' : 'object-cover'}`}
                         containerClassName="w-full h-full"

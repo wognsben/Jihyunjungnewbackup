@@ -65,10 +65,17 @@ export const WorkProvider = ({ children }: { children: ReactNode }) => {
       setIsWorksLoading(true);
       setError(null);
 
-      try {
+            try {
   const fetchedWorks = await fetchWorks();
   console.log('[WorkProvider] fetchedWorks:', fetchedWorks);
   console.log('[WorkProvider] fetchedWorks.length:', fetchedWorks?.length);
+  console.log('[WorkProvider] fetchedWorks[0]:', fetchedWorks?.[0]);
+  console.log('[WorkProvider] fetchedWorks[0]?.previewImage_ko:', fetchedWorks?.[0]?.previewImage_ko);
+  console.log('[WorkProvider] fetchedWorks[0]?.previewImage_en:', fetchedWorks?.[0]?.previewImage_en);
+  console.log('[WorkProvider] fetchedWorks[0]?.previewImage_jp:', fetchedWorks?.[0]?.previewImage_jp);
+  console.log('[WorkProvider] fetchedWorks[0]?.thumbnail:', fetchedWorks?.[0]?.thumbnail);
+  console.log('[WorkProvider] fetchedWorks[0]?.thumbnail_en:', fetchedWorks?.[0]?.thumbnail_en);
+  console.log('[WorkProvider] fetchedWorks[0]?.thumbnail_jp:', fetchedWorks?.[0]?.thumbnail_jp);
 
   setWorks(fetchedWorks);
   worksLoadedRef.current = true;

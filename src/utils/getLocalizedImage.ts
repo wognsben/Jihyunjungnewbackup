@@ -8,8 +8,13 @@ type Language = 'ko' | 'en' | 'jp';
  * 없으면 기본 thumbnail을 fallback으로 사용합니다.
  */
 export const getLocalizedThumbnail = (work: Work, lang: Language): string => {
+  if (lang === 'en' && work.previewImage_en) return work.previewImage_en;
+  if (lang === 'jp' && work.previewImage_jp) return work.previewImage_jp;
+  if (lang === 'ko' && work.previewImage_ko) return work.previewImage_ko;
+
   if (lang === 'en' && work.thumbnail_en) return work.thumbnail_en;
   if (lang === 'jp' && work.thumbnail_jp) return work.thumbnail_jp;
+
   return work.thumbnail;
 };
 
